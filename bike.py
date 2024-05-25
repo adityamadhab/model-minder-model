@@ -7,8 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 
+# Load your pre-trained model
 model = tf.keras.models.load_model('anchal_model.h5')
 
+# Function to preprocess image for model prediction
 def preprocess_image(img_path):
     img = Image.open(img_path).convert('RGB')
     img = img.resize((224, 224))
@@ -17,25 +19,38 @@ def preprocess_image(img_path):
     img_array = preprocess_input(img_array)
     return img_array
 
+# Function to make predictions on the uploaded image
 def predict_image(model, img_path):
     img_array = preprocess_image(img_path)
     predictions = model.predict(img_array)
     decoded_predictions = decode_predictions(predictions, top=5)[0]
     return decoded_predictions
 
+# Streamlit app
 st.title("Model Minder")
 
+# Style for light and dark modes
 st.markdown(
     """
     <style>
-    .reportview-container, .main {
+    .reportview-container {
         background-color: #f5f5f5;
+    }
+    .sidebar .sidebar-content {
+        background: #f5f5f5;
+    }
+    .css-1lcbmhc {
+        background-color: #2e2e2e;
+    }
+    .css-1lcbmhc .stButton>button {
+        color: white;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
+# File uploader
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "webp"])
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
@@ -64,7 +79,6 @@ if uploaded_file is not None:
     
     top_prediction = predictions[0]
     st.write(f"**Top Prediction:** {top_prediction[1]} ({top_prediction[2] * 100:.2f}%)")
-
 
     st.download_button(
         label="Download Image",
